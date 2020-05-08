@@ -7,26 +7,13 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  final mobileFocusNode = FocusNode();
-  final smsFocusNode = FocusNode();
-
   final mobileTextController = TextEditingController();
   final smsTextController = TextEditingController();
 
   @override
-  void dispose() {
-    if (mobileFocusNode.hasFocus) {
-      mobileFocusNode.unfocus();
-    } else if (smsFocusNode.hasFocus) {
-      smsFocusNode.unfocus();
-    }
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xFFF5F5F5),
         appBar: AppBar(
           title: Text('登录/注册'),
         ),
@@ -95,7 +82,6 @@ class _LoginViewState extends State<LoginView> {
     return TextField(
       keyboardAppearance: Brightness.light,
       keyboardType: TextInputType.number,
-      focusNode: mobileFocusNode,
       controller: mobileTextController,
       maxLength: 11,
       style: TextStyle(
@@ -121,7 +107,6 @@ class _LoginViewState extends State<LoginView> {
         Expanded(
           child: TextField(
             keyboardType: TextInputType.number,
-            focusNode: smsFocusNode,
             controller: smsTextController,
             maxLength: 4,
             style: TextStyle(
