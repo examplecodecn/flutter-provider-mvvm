@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_provider_mvvm/base_view.dart';
+import 'package:flutter_provider_mvvm/views/base_view.dart';
 import 'package:flutter_provider_mvvm/models/user.dart';
 import 'package:flutter_provider_mvvm/route_paths.dart';
 import 'package:flutter_provider_mvvm/viewmodels/login_model.dart';

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_provider_mvvm/api.dart';
-import 'package:flutter_provider_mvvm/base_model.dart';
+import 'package:flutter_provider_mvvm/viewmodels/base_model.dart';
 import 'package:flutter_provider_mvvm/models/user.dart';
 
 class LoginViewModel extends BaseModel {
