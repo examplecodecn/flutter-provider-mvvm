@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_provider_mvvm/base_view.dart';
+import 'package:flutter_provider_mvvm/models/user.dart';
 import 'package:flutter_provider_mvvm/route_paths.dart';
+import 'package:flutter_provider_mvvm/viewmodels/login_model.dart';
+import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
   @override
@@ -12,28 +16,33 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Color(0xFFF5F5F5),
-        appBar: AppBar(
-          title: Text('登录/注册'),
-        ),
-        body: Builder(
-          builder: (context) => _buildLoginContent(context),
-        ));
+    return BaseView<LoginViewModel>(
+      model: LoginViewModel(api: Provider.of(context)),
+      onModelReady: (model) {},
+      builder: (context, model, child) {
+        return Scaffold(
+          backgroundColor: Color(0xFFF5F5F5),
+          appBar: AppBar(
+            title: Text('登录/注册'),
+          ),
+          body: _buildLoginContent(context, model),
+        );
+      },
+    );
   }
 
-  Widget _buildLoginContent(BuildContext context) {
+  Widget _buildLoginContent(BuildContext context, LoginViewModel model) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _buildTitle(context),
+            _buildTitle(context, model),
             SizedBox(height: 30),
-            _buildSignArea(context),
+            _buildSignArea(context, model),
             SizedBox(height: 50),
-            _buildLoginBtn(context),
+            _buildLoginBtn(context, model),
             SizedBox(height: 16),
           ],
         ),
@@ -41,7 +50,7 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget _buildTitle(BuildContext context) {
+  Widget _buildTitle(BuildContext context, LoginViewModel model) {
     return Column(
       children: <Widget>[
         Text(
@@ -58,17 +67,17 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget _buildSignArea(BuildContext context) {
+  Widget _buildSignArea(BuildContext context, LoginViewModel model) {
     return Container(
       width: 270,
       child: Column(
         children: <Widget>[
-          _buildMobile(context),
+          _buildMobile(context, model),
           Container(
             height: 0.5,
             color: Color(0xFF6a6a6a),
           ),
-          _buildSMS(context),
+          _buildSMS(context, model),
           Container(
             height: 0.5,
             color: Color(0xFF6a6a6a),
@@ -78,7 +87,7 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget _buildMobile(BuildContext context) {
+  Widget _buildMobile(BuildContext context, LoginViewModel model) {
     return TextField(
       keyboardAppearance: Brightness.light,
       keyboardType: TextInputType.number,
@@ -100,7 +109,7 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget _buildSMS(BuildContext context) {
+  Widget _buildSMS(BuildContext context, LoginViewModel model) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -125,12 +134,21 @@ class _LoginViewState extends State<LoginView> {
           ),
         ),
         GestureDetector(
-          onTap: () async {},
+          onTap: () async {
+            if (model.countdownTime == 0) {
+              await model.sendSms(mobileTextController.text);
+              model.startCountdown();
+            }
+          },
           child: Text(
-            '发送短信验证码',
+            model.countdownTime > 0
+                ? '${model.countdownTime}秒后重新发送'
+                : '请输入短信验证码',
             style: TextStyle(
               fontSize: 14,
-              color: Color(0xFF6a6a6a),
+              color: model.countdownTime > 0
+                  ? Color(0xFFa5a5a5)
+                  : Color(0xFF191919),
             ),
           ),
         )
@@ -138,14 +156,17 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget _buildLoginBtn(BuildContext context) {
+  Widget _buildLoginBtn(BuildContext context, LoginViewModel model) {
     return ButtonTheme(
       minWidth: 270,
       height: 45,
       buttonColor: Color(0xFF08ba07),
       child: RaisedButton(
         onPressed: () async {
-          Navigator.of(context).pushNamed(RoutePaths.HOME);
+          if (await model.login(
+              mobileTextController.text, smsTextController.text)) {
+            Navigator.of(context).pushNamed(RoutePaths.HOME);
+          }
         },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
